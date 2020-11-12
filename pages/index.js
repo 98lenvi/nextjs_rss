@@ -23,9 +23,7 @@ import {
 import AudioPlayer from 'react-h5-audio-player';
 
 function Page({ feed }) {
-  const {
-    items
-  } = feed
+
   const [audioSrc, setAudioSrc] = React.useState('');
 
   const Element = ({ item, index }) => {
@@ -63,7 +61,7 @@ function Page({ feed }) {
       </Article>
     )
   }
-  
+
   return(
     <PageWrapper>
       <AudioPlayerWrapper>
@@ -72,7 +70,8 @@ function Page({ feed }) {
           src={audioSrc} 
         />
       </AudioPlayerWrapper>
-      {items.map( (item,index) => <Element item={item} index={index}/>)}
+      {feed && feed.items.map( (item,index) => <Element item={item} index={index}/>)}
+      {!feed && <form action={'/'} method="get"><input name='rss'/></form>}
     </PageWrapper>
   )
 }
@@ -80,6 +79,9 @@ function Page({ feed }) {
 // This gets called on every request
 export async function getServerSideProps(context) {
   const { rss } = context.query
+  if( !rss ){
+    return { props: {  } }  
+  }
   let parser = new Parser();
   let feed = await parser.parseURL(rss);
   return { props: { feed } }
